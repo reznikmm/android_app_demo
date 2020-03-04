@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+
+
+<!--
+<script type="module">
+-->
+<html>
+<script id="cube-vertex-shader" type="not-javascript">
+  uniform mat4 uModelMoveMatrix;
+  uniform mat4 uModelViewMatrix;
+  uniform mat4 uProjectionMatrix;
+  attribute vec4 aVertexPosition;
+  attribute vec3 aVertexColor;
+  attribute vec2 aTexCoordinates;
+  varying vec3 vColor;
+  varying vec2 vTexCoordinates;
+
+  void main() {
+    gl_Position = uProjectionMatrix * uModelViewMatrix * uModelMoveMatrix * aVertexPosition;
+    vColor = aVertexColor;
+    vTexCoordinates = aTexCoordinates;
+  }
+</script>
+<script id="cube-fragment-shader" type="not-javascript">
+  precision mediump float;
+
+  uniform sampler2D uTexture;
+  uniform bool uUseTexture;
+  varying vec3 vColor;
+  varying vec2 vTexCoordinates;
+
+  void main() {
+    if (uUseTexture) {
+      gl_FragColor = texture2D(uTexture, vTexCoordinates);
+    } else {
+      gl_FragColor = vec4(vColor, 1.0);
+    }
+  }
+</script>
+
+<!--
+<script src='adawebpack.js'></script>
+<script>
+  var instance;
+
+  var local_functions = {
+    __gnat_put_web_string: function(address,size) {
+       console.log(string_to_js(address,size));
+    }
+  };
+  var imports = {
+    env: Object.assign({}, local_functions, adawebpack)
+  };
+  fetch("cube.wasm")
+    .then(response => response.arrayBuffer())
+    .then(bytes => WebAssembly.instantiate(bytes, imports))
+    .then(obj => {
+      instance = obj.instance;
+      obj.instance.exports.adainit();
+    })
+</script>
+-->
+<!--
+  var module;
+  module = fetch(".objs/main")
+    .then(response => response.arrayBuffer())
+    .then(bytes => WebAssembly.instantiate(bytes))
+    .then(obj => { const m = obj; return obj; })
+  console.log(module);
+  console.log(m);
+<script type="module">
+  async function init() {
+    const { instance } = await WebAssembly.instantiateStreaming(
+      fetch("./add.wasm")
+    );
+    console.log(instance.exports.add(4, 1));
+    .then(obj => console.log(obj.instance.exports.add(4, 1)))
+  }
+  init();
+</script>
+-->
+<body>
+<div id='adawebpackloadingindicator' data-adawebpack-main='_ada_cube' data-adawebpack-wasm='cube.wasm'>
+  <style>
+    .adawebpackloader-progress {
+      border: 16px solid #f3f3f3; /* Light grey */
+      border-top: 16px solid red;
+      border-bottom: 16px solid red;
+      border-radius: 50%;
+      width: 120px;
+      height: 120px;
+      animation: spin 2s linear infinite;
+    }
+
+    .adawebpackloader-progress-loading {
+      border-top-color: #3498db; /* Blue */
+      border-bottom-color: #3498db;
+    }
+
+    #adawebpackloadingindicator {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+  </style>
+
+  <script type='module'>
+    //  Lookup for loader indicator and obtain parameters.
+    let indicator = document.getElementById('adawebpackloadingindicator');
+    let progress = document.getElementById('adawebpackloadingindicator-progress');
+    let main = indicator.dataset.adawebpackMain;
+    let wasm = indicator.dataset.adawebpackWasm;
+
+    progress.classList.add("adawebpackloader-progress-loading");
+
+    import * as AdaWebPack from './adawebpack.mjs';
+
+    (async () => {
+      const fetchPromise = fetch(wasm);
+      const { instance } =
+        await WebAssembly.instantiateStreaming(fetchPromise, {env: AdaWebPack.imports});
+      AdaWebPack.initialize(instance);
+      instance.exports[main]();
+      indicator.hidden = true;
+    })();
+  </script>
+
+  <div id='adawebpackloadingindicator-progress' class='adawebpackloader-progress'></div>
+</div>
+  <canvas style='width: 100%; hieght: 100%;' id='cube_gl_canvas'></canvas>
+<!--
+  <img id='cube-texture' src='ada_new.svg' hidden='hidden'/>
+  <img id='cube-texture' src='f-texture.png' hidden='hidden'/>
+  <img id='cube-texture' src='picture.png' hidden='hidden'/>
+  <img id='cube-texture' src='noodles.jpg' hidden='hidden'/>
+-->
+  <img id='cube-texture' src='GNAT-Pro-512.jpg' hidden='hidden'/>
+</body>
+</html>
