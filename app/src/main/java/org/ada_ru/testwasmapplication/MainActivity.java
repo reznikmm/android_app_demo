@@ -34,16 +34,20 @@ public class MainActivity extends AppCompatActivity {
             public WebResourceResponse shouldInterceptRequest(WebView view,
                                                               WebResourceRequest request) {
                 String path = request.getUrl().getLastPathSegment();
-                AssetManager assetManager = getAssets();
+
                 try {
-                    String mime = "text/plain";
+                    String mime;
+                    AssetManager assetManager = getAssets();
+
                     if (path.endsWith(".html")) mime = "text/html";
                     else if (path.endsWith(".wasm")) mime = "application/wasm";
                     else if (path.endsWith(".mjs")) mime = "text/javascript";
                     else if (path.endsWith(".jpg")) mime = "image/jpeg";
-                    else if (path.endsWith(".css"))
-                        return super.shouldInterceptRequest(view, request);  // mime = "text/css";
+                    else
+                        return super.shouldInterceptRequest(view, request);
+
                     InputStream input = assetManager.open("www/" + path);
+
                     return new WebResourceResponse(mime, "utf-8", input);
                 } catch (IOException e) {
                     e.printStackTrace();
